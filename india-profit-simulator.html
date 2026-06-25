@@ -1,0 +1,1950 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>India Gaming Profit Simulator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --text: #1d1d1f;
+      --text-secondary: #86868b;
+      --muted: #6e6e73;
+      --hairline: rgba(0, 0, 0, 0.08);
+      --hairline-strong: rgba(0, 0, 0, 0.12);
+      --glass: rgba(255, 255, 255, 0.72);
+      --glass-strong: rgba(255, 255, 255, 0.88);
+      --panel: rgba(255, 255, 255, 0.68);
+      --sidebar: rgba(249, 249, 249, 0.72);
+      --control: rgba(255, 255, 255, 0.82);
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.04), 0 8px 16px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04), 0 16px 32px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.06), 0 32px 64px rgba(0, 0, 0, 0.12);
+      --accent: #007aff;
+      --accent-2: #34c759;
+      --accent-3: #ff9500;
+      --danger: #ff3b30;
+      --ok: #30d158;
+      --warn: #ff9f0a;
+      --radius-window: 24px;
+      --radius-card: 16px;
+      --radius-control: 10px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --text: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --muted: #98989d;
+      --hairline: rgba(255, 255, 255, 0.1);
+      --hairline-strong: rgba(255, 255, 255, 0.15);
+      --glass: rgba(30, 30, 30, 0.72);
+      --glass-strong: rgba(30, 30, 30, 0.88);
+      --panel: rgba(44, 44, 46, 0.68);
+      --sidebar: rgba(28, 28, 30, 0.72);
+      --control: rgba(58, 58, 60, 0.82);
+      --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.3), 0 16px 32px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.4), 0 32px 64px rgba(0, 0, 0, 0.6);
+      --accent: #0a84ff;
+      --accent-2: #32d74b;
+      --accent-3: #ff9f0a;
+      --danger: #ff453a;
+      --ok: #32d74b;
+      --warn: #ffd60a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: linear-gradient(180deg, #f5f5f7 0%, #e8e8ed 100%);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      letter-spacing: -0.003em;
+      font-weight: 400;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(0, 122, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(52, 199, 89, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(255, 149, 0, 0.05) 0%, transparent 60%);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body[data-theme="dark"] {
+      background:
+        radial-gradient(circle at 20% 10%, rgba(10, 132, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(50, 215, 75, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 100%, rgba(255, 159, 10, 0.1) 0%, transparent 60%),
+        linear-gradient(180deg, #1c1c1e 0%, #000000 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      color: inherit;
+    }
+
+    .desktop {
+      width: min(1560px, calc(100vw - 32px));
+      min-height: calc(100vh - 32px);
+      margin: 16px auto;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .window {
+      width: 100%;
+      min-height: calc(100vh - 32px);
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      overflow: hidden;
+      border: 0.5px solid var(--hairline);
+      border-radius: var(--radius-window);
+      background: var(--glass-strong);
+      box-shadow: var(--shadow-lg),
+                  inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(60px) saturate(180%);
+      -webkit-backdrop-filter: blur(60px) saturate(180%);
+    }
+
+    .sidebar {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      border-right: 0.5px solid var(--hairline);
+      background: var(--sidebar);
+      backdrop-filter: blur(40px) saturate(165%);
+      -webkit-backdrop-filter: blur(40px) saturate(165%);
+    }
+
+    .traffic {
+      height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 18px;
+      border-bottom: 0.5px solid var(--hairline);
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.1);
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28ca42; }
+
+    .brand {
+      padding: 22px 20px 18px;
+    }
+
+    .brand h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.1;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .nav {
+      padding: 0 14px 18px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav-item {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: var(--radius-control);
+      color: var(--muted);
+      background: transparent;
+      border: 0;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 6px;
+      background: var(--control);
+      border: 0.5px solid var(--hairline);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-item.active {
+      color: var(--text);
+      background: var(--control);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .nav-item:hover:not(.active) {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    body[data-theme="dark"] .nav-item:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .note {
+      margin: auto 16px 16px;
+      padding: 14px;
+      border: 0.5px solid var(--hairline);
+      border-radius: var(--radius-card);
+      background: var(--control);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.52;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      background: transparent;
+    }
+
+    .toolbar {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 9px 18px;
+      border-bottom: 0.5px solid var(--hairline);
+      background: var(--glass);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+    }
+
+    .search {
+      min-width: 220px;
+      max-width: 420px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 32px;
+      padding: 0 12px;
+      border: 0.5px solid var(--hairline);
+      border-radius: 999px;
+      background: var(--control);
+      color: var(--muted);
+      box-shadow: var(--shadow-sm);
+      font-size: 13px;
+    }
+
+    .search span:first-child {
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .toolbar-title {
+      min-width: 0;
+      font-size: 13px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .spacer {
+      flex: 1;
+    }
+
+    .segmented {
+      display: inline-flex;
+      gap: 2px;
+      padding: 2px;
+      border: 0.5px solid var(--hairline);
+      border-radius: 999px;
+      background: var(--control);
+      min-width: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .segmented button,
+    .pill-button {
+      min-height: 28px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 400;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .segmented button.active,
+    .pill-button {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    body[data-theme="dark"] .segmented button.active,
+    body[data-theme="dark"] .pill-button {
+      background: rgba(255, 255, 255, 0.18);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .content {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(310px, 392px) minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px;
+      align-items: start;
+    }
+
+    .controls,
+    .dashboard {
+      min-width: 0;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      max-height: calc(100vh - 86px);
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .section,
+    .metric,
+    .chart-card,
+    .table-card,
+    .insight-card {
+      border: 0.5px solid var(--hairline);
+      border-radius: var(--radius-card);
+      background: var(--panel);
+      box-shadow: var(--shadow-sm),
+                  inset 0 0 0 0.5px rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+    }
+
+    .section {
+      padding: 14px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .section-tag {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .control {
+      display: grid;
+      gap: 8px;
+      padding: 10px 0;
+      border-top: 0.5px solid var(--hairline);
+    }
+
+    .control:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .label-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    label {
+      min-width: 0;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 500;
+    }
+
+    .value {
+      min-width: 84px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--control);
+      color: var(--text);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+      border: 0.5px solid var(--hairline);
+      box-shadow: var(--shadow-sm);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 22px;
+      margin: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent) var(--fill, 50%), rgba(0, 0, 0, 0.08) var(--fill, 50%));
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      margin-top: -8px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 0.5px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), 0 6px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="range"]::-webkit-slider-thumb:active {
+      transform: scale(1.05);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    input[type="range"]::-moz-range-progress {
+      height: 4px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 0.5px solid rgba(0, 0, 0, 0.12);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .dashboard {
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero-panel {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(230px, 0.75fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .headline {
+      min-width: 0;
+      padding: 20px;
+      border: 0.5px solid var(--hairline);
+      border-radius: var(--radius-card);
+      background: var(--glass-strong);
+      backdrop-filter: blur(60px) saturate(180%);
+      -webkit-backdrop-filter: blur(60px) saturate(180%);
+      box-shadow: var(--shadow-md),
+                  inset 0 0 0 0.5px rgba(255, 255, 255, 0.5);
+    }
+
+    .headline h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+
+    .headline p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      max-width: 760px;
+      font-weight: 400;
+    }
+
+    .status-card {
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+      padding: 18px;
+      border: 0.5px solid var(--hairline);
+      border-radius: var(--radius-card);
+      background: var(--panel);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-label {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .status-value {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(52, 199, 89, 0.12);
+      color: var(--ok);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .status-value.loss {
+      background: rgba(255, 59, 48, 0.12);
+      color: var(--danger);
+    }
+
+    .status-value.warn {
+      background: rgba(255, 159, 10, 0.12);
+      color: var(--warn);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 1400px) {
+      .metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .metric {
+      min-height: 118px;
+      padding: 16px;
+      display: grid;
+      align-content: space-between;
+      gap: 12px;
+    }
+
+    .metric small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 500;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    .metric .delta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric.positive strong,
+    .metric.positive .delta {
+      color: var(--ok);
+    }
+
+    .metric.negative strong,
+    .metric.negative .delta {
+      color: var(--danger);
+    }
+
+    .chart-card {
+      min-width: 0;
+      padding: 14px;
+    }
+
+    .chart-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .chart-head h2,
+    .table-card h2,
+    .insight-card h2 {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.2;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      background: var(--accent);
+    }
+
+    .swatch.profit { background: var(--accent-2); }
+    .swatch.revenue { background: var(--accent); }
+    .swatch.loss { background: var(--danger); }
+
+    canvas {
+      width: 100%;
+      height: 290px;
+      display: block;
+      border-radius: 12px;
+      background: var(--control);
+      border: 0.5px solid var(--hairline);
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr);
+      gap: 16px;
+    }
+
+    .table-card,
+    .insight-card {
+      min-width: 0;
+      padding: 14px;
+    }
+
+    .table {
+      width: 100%;
+      margin-top: 10px;
+      border-collapse: collapse;
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table th,
+    .table td {
+      padding: 10px 8px;
+      text-align: right;
+      border-top: 0.5px solid var(--hairline);
+      white-space: nowrap;
+    }
+
+    .table th:first-child,
+    .table td:first-child {
+      text-align: left;
+      white-space: normal;
+      color: var(--muted);
+    }
+
+    .table th {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .insights {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .insight {
+      padding: 12px;
+      border: 0.5px solid var(--hairline);
+      border-radius: 12px;
+      background: var(--control);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    .insight strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .pill-button {
+      border: 0.5px solid var(--hairline);
+      min-height: 32px;
+    }
+
+    .pill-button.primary {
+      color: #ffffff;
+      background: var(--accent);
+      border-color: transparent;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25), 0 4px 16px rgba(0, 122, 255, 0.15);
+      font-weight: 500;
+    }
+
+    .pill-button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 12px rgba(0, 122, 255, 0.3), 0 6px 20px rgba(0, 122, 255, 0.2);
+    }
+
+    .pill-button.primary:active {
+      transform: translateY(0);
+    }
+
+    .copied {
+      color: var(--ok);
+      font-size: 12px;
+      align-self: center;
+      opacity: 0;
+      transition: opacity 160ms ease;
+    }
+
+    .copied.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 1180px) {
+      .window {
+        grid-template-columns: 240px minmax(0, 1fr);
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        max-height: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .desktop {
+        width: 100%;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .window {
+        min-height: 100vh;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        border-right: 0;
+        border-bottom: 0.5px solid var(--hairline);
+      }
+
+      .brand {
+        padding: 14px 16px 10px;
+      }
+
+      .brand p,
+      .nav,
+      .note {
+        display: none;
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+        align-items: stretch;
+      }
+
+      .search {
+        order: 3;
+        min-width: 100%;
+      }
+
+      .content {
+        padding: 12px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-panel,
+      .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .headline h2 {
+        font-size: 24px;
+      }
+
+      .metric {
+        min-height: 100px;
+      }
+
+      .table {
+        font-size: 12px;
+      }
+
+      .table th:nth-child(3),
+      .table td:nth-child(3) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <div class="window">
+      <aside class="sidebar">
+        <div class="traffic" aria-label="macOS window controls">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="brand">
+          <h1>India ProfitLab</h1>
+          <p>面向印度市场的社交娱乐游戏盈利测算。默认模型不包含提现、可兑换筹码或面向印度用户的真钱下注。</p>
+        </div>
+        <nav class="nav" aria-label="tool sections">
+          <button class="nav-item active" type="button"><span class="nav-icon">P</span><span>利润预测</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">U</span><span>用户增长</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">R</span><span>收入结构</span></button>
+          <button class="nav-item" type="button"><span class="nav-icon">C</span><span>成本压力</span></button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="toolbar">
+          <div class="toolbar-title">盈利模型模拟器</div>
+          <div class="search" aria-label="model note"><span>Q</span><span>拖动左侧滑杆，即时更新利润、LTV 和回本周期</span></div>
+          <div class="spacer"></div>
+          <div class="segmented" aria-label="scenario presets">
+            <button type="button" data-preset="base" class="active">基准</button>
+            <button type="button" data-preset="lean">保守</button>
+            <button type="button" data-preset="growth">增长</button>
+          </div>
+          <button class="pill-button" id="themeToggle" type="button">深色</button>
+        </header>
+
+        <div class="content">
+          <section class="controls" aria-label="assumptions">
+            <div class="section">
+              <div class="section-head">
+                <h2>获客与转化</h2>
+                <span class="section-tag">Acquisition</span>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="marketingBudget">月营销预算</label>
+                  <span class="value" id="marketingBudgetValue"></span>
+                </div>
+                <input id="marketingBudget" type="range" min="100000" max="15000000" step="100000" value="3000000">
+                <p class="hint">广告、KOL、联盟、渠道投放的月度总预算。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="cac">注册用户 CAC</label>
+                  <span class="value" id="cacValue"></span>
+                </div>
+                <input id="cac" type="range" min="10" max="900" step="5" value="120">
+                <p class="hint">每获得一个注册用户的平均成本。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="organicUplift">自然新增放大</label>
+                  <span class="value" id="organicUpliftValue"></span>
+                </div>
+                <input id="organicUplift" type="range" min="0" max="80" step="1" value="18">
+                <p class="hint">口碑、邀请和自然搜索带来的额外新增比例。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="activationRate">注册到活跃</label>
+                  <span class="value" id="activationRateValue"></span>
+                </div>
+                <input id="activationRate" type="range" min="10" max="95" step="1" value="54">
+                <p class="hint">注册用户在当月进入游戏并形成 MAU 的比例。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="firstDepositRate">首充转化率 ⭐</label>
+                  <span class="value" id="firstDepositRateValue"></span>
+                </div>
+                <input id="firstDepositRate" type="range" min="5" max="60" step="1" value="28">
+                <p class="hint">激活用户中完成首次充值的比例，关键漏斗指标。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="firstDepositAmount">首充金额</label>
+                  <span class="value" id="firstDepositAmountValue"></span>
+                </div>
+                <input id="firstDepositAmount" type="range" min="100" max="5000" step="50" value="800">
+                <p class="hint">首次充值的平均金额。</p>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h2>活跃与留存</h2>
+                <span class="section-tag">Retention</span>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="baseMau">当前月活基数</label>
+                  <span class="value" id="baseMauValue"></span>
+                </div>
+                <input id="baseMau" type="range" min="0" max="1500000" step="10000" value="180000">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="stickiness">DAU / MAU</label>
+                  <span class="value" id="stickinessValue"></span>
+                </div>
+                <input id="stickiness" type="range" min="5" max="55" step="1" value="23">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="lifetimeMonths">平均付费生命周期</label>
+                  <span class="value" id="lifetimeMonthsValue"></span>
+                </div>
+                <input id="lifetimeMonths" type="range" min="1" max="24" step="1" value="7">
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h2>变现</h2>
+                <span class="section-tag">Revenue</span>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="payerRate">付费率</label>
+                  <span class="value" id="payerRateValue"></span>
+                </div>
+                <input id="payerRate" type="range" min="0.5" max="18" step="0.1" value="4.2">
+                <p class="hint">购买虚拟金币包、皮肤、通行证等不可提现商品的用户比例。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="arppu">月 ARPPU</label>
+                  <span class="value" id="arppuValue"></span>
+                </div>
+                <input id="arppu" type="range" min="50" max="5000" step="50" value="850">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="rechargeFrequency">月充值次数 ⭐</label>
+                  <span class="value" id="rechargeFrequencyValue"></span>
+                </div>
+                <input id="rechargeFrequency" type="range" min="1" max="10" step="0.1" value="2.8">
+                <p class="hint">付费用户每月平均充值次数，影响现金流。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="whaleRate">大R占比 ⭐</label>
+                  <span class="value" id="whaleRateValue"></span>
+                </div>
+                <input id="whaleRate" type="range" min="0.5" max="20" step="0.1" value="5.5">
+                <p class="hint">月充值>₹10,000的高价值用户占付费用户的比例。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="whaleArppu">大R月ARPPU</label>
+                  <span class="value" id="whaleArppuValue"></span>
+                </div>
+                <input id="whaleArppu" type="range" min="5000" max="50000" step="500" value="8500">
+                <p class="hint">高价值用户的月均充值金额。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="withdrawRate">提现率 ⭐</label>
+                  <span class="value" id="withdrawRateValue"></span>
+                </div>
+                <input id="withdrawRate" type="range" min="40" max="95" step="1" value="68">
+                <p class="hint">提现金额/充值金额，健康值60-75%。过高说明玩家赢太多。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="subscriptionRate">订阅渗透</label>
+                  <span class="value" id="subscriptionRateValue"></span>
+                </div>
+                <input id="subscriptionRate" type="range" min="0" max="12" step="0.1" value="1.3">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="subscriptionPrice">订阅月费</label>
+                  <span class="value" id="subscriptionPriceValue"></span>
+                </div>
+                <input id="subscriptionPrice" type="range" min="49" max="999" step="10" value="249">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="adArpdau">广告 ARPDAU</label>
+                  <span class="value" id="adArpdauValue"></span>
+                </div>
+                <input id="adArpdau" type="range" min="0" max="5" step="0.05" value="0.45">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="b2bRevenue">B2B / 授权收入</label>
+                  <span class="value" id="b2bRevenueValue"></span>
+                </div>
+                <input id="b2bRevenue" type="range" min="0" max="8000000" step="100000" value="600000">
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">
+                <h2>成本与税费</h2>
+                <span class="section-tag">Costs</span>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="paymentFee">支付通道费</label>
+                  <span class="value" id="paymentFeeValue"></span>
+                </div>
+                <input id="paymentFee" type="range" min="0" max="10" step="0.1" value="2.6">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="paymentSuccessRate">支付成功率 ⭐</label>
+                  <span class="value" id="paymentSuccessRateValue"></span>
+                </div>
+                <input id="paymentSuccessRate" type="range" min="60" max="95" step="1" value="78">
+                <p class="hint">印度UPI支付成功率70-85%，每降低5%损失3-4%转化。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="providerShare">游戏供应商分成</label>
+                  <span class="value" id="providerShareValue"></span>
+                </div>
+                <input id="providerShare" type="range" min="0" max="35" step="0.5" value="12">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="promoRate">奖金与促销成本</label>
+                  <span class="value" id="promoRateValue"></span>
+                </div>
+                <input id="promoRate" type="range" min="0" max="45" step="0.5" value="16">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="effectiveTax">有效税费/合规压力</label>
+                  <span class="value" id="effectiveTaxValue"></span>
+                </div>
+                <input id="effectiveTax" type="range" min="0" max="40" step="0.5" value="8">
+                <p class="hint">合规社交模型可设低；真钱或高风险市场要显著提高。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="cloudCost">每 MAU 云与客服成本</label>
+                  <span class="value" id="cloudCostValue"></span>
+                </div>
+                <input id="cloudCost" type="range" min="0" max="40" step="0.5" value="5">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="withdrawProcessCost">每笔提现审核成本 ⭐</label>
+                  <span class="value" id="withdrawProcessCostValue"></span>
+                </div>
+                <input id="withdrawProcessCost" type="range" min="0" max="50" step="1" value="8">
+                <p class="hint">KYC审核+反欺诈人工成本，印度市场必需。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="fraudLossRate">欺诈损失率 ⭐</label>
+                  <span class="value" id="fraudLossRateValue"></span>
+                </div>
+                <input id="fraudLossRate" type="range" min="0" max="10" step="0.1" value="1.2">
+                <p class="hint">刷单、羊毛党、欺诈造成的损失占收入比例。</p>
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="complianceCost">每新增合规/KYC成本</label>
+                  <span class="value" id="complianceCostValue"></span>
+                </div>
+                <input id="complianceCost" type="range" min="0" max="80" step="1" value="6">
+              </div>
+              <div class="control">
+                <div class="label-row">
+                  <label for="fixedOpex">月固定运营成本</label>
+                  <span class="value" id="fixedOpexValue"></span>
+                </div>
+                <input id="fixedOpex" type="range" min="100000" max="20000000" step="100000" value="4200000">
+              </div>
+            </div>
+          </section>
+
+          <section class="dashboard" aria-label="profit dashboard">
+            <div class="hero-panel">
+              <div class=”headline”>
+                <h2>项目盈利测算</h2>
+                <p>通用盈利模型，支持社交娱乐和真金模式。你可以调整 CAC、付费率、ARPPU、提现率、支付成功率、供应商分成、促销和税费等参数，观察净利润、现金流、LTV/CAC 和 12 个月走势。</p>
+              </div>
+              <div class="status-card">
+                <div>
+                  <div class="status-label">当前经营状态</div>
+                  <div class="status-value" id="statusValue">盈利</div>
+                </div>
+                <div class="status-label" id="statusText"></div>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <article class="metric" id="profitMetric">
+                <small>月净利润</small>
+                <strong id="netProfit"></strong>
+                <span class="delta" id="profitMargin"></span>
+              </article>
+              <article class="metric">
+                <small>月收入</small>
+                <strong id="grossRevenue"></strong>
+                <span class="delta" id="revenueMix"></span>
+              </article>
+              <article class="metric" id="ltvMetric">
+                <small>LTV / CAC</small>
+                <strong id="ltvCac"></strong>
+                <span class="delta" id="ltvDetail"></span>
+              </article>
+              <article class="metric">
+                <small>回本周期</small>
+                <strong id="payback"></strong>
+                <span class="delta" id="breakEvenCac"></span>
+              </article>
+              <article class="metric" id="withdrawMetric">
+                <small>提现率 ⭐</small>
+                <strong id="withdrawRateDisplay"></strong>
+                <span class="delta" id="withdrawDetail"></span>
+              </article>
+              <article class="metric" id="cashflowMetric">
+                <small>净现金流 ⭐</small>
+                <strong id="netCashFlow"></strong>
+                <span class="delta" id="cashflowDetail"></span>
+              </article>
+              <article class="metric" id="paymentMetric">
+                <small>支付成功率 ⭐</small>
+                <strong id="paymentSuccessDisplay"></strong>
+                <span class="delta" id="paymentLossDisplay"></span>
+              </article>
+              <article class="metric" id="firstDepositMetric">
+                <small>首充转化 ⭐</small>
+                <strong id="firstDepositDisplay"></strong>
+                <span class="delta" id="firstDepositRevenue"></span>
+              </article>
+            </div>
+
+            <div class="chart-card">
+              <div class="chart-head">
+                <h2>12 个月预测</h2>
+                <div class="legend">
+                  <span><i class="swatch revenue"></i>收入</span>
+                  <span><i class="swatch profit"></i>利润</span>
+                  <span><i class="swatch loss"></i>亏损</span>
+                </div>
+              </div>
+              <canvas id="projectionChart" width="1200" height="360" aria-label="12-month revenue and profit chart"></canvas>
+            </div>
+
+            <div class="lower-grid">
+              <div class="table-card">
+                <h2>核心拆解</h2>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>项目</th>
+                      <th>当月</th>
+                      <th>占收入</th>
+                    </tr>
+                  </thead>
+                  <tbody id="breakdown"></tbody>
+                </table>
+              </div>
+              <div class="insight-card">
+                <h2>策略提示</h2>
+                <div class="insights" id="insights"></div>
+                <div class="footer-actions">
+                  <button class="pill-button primary" id="copySummary" type="button">复制摘要</button>
+                  <button class="pill-button" id="resetBase" type="button">恢复基准</button>
+                  <span class="copied" id="copiedText">已复制</span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const presets = {
+      base: {
+        marketingBudget: 3000000,
+        cac: 90,
+        organicUplift: 25,
+        activationRate: 60,
+        firstDepositRate: 28,
+        firstDepositAmount: 800,
+        baseMau: 300000,
+        stickiness: 26,
+        lifetimeMonths: 7,
+        payerRate: 5.2,
+        arppu: 1000,
+        rechargeFrequency: 2.8,
+        whaleRate: 5.5,
+        whaleArppu: 8500,
+        withdrawRate: 68,
+        subscriptionRate: 1.8,
+        subscriptionPrice: 249,
+        adArpdau: 0.55,
+        b2bRevenue: 800000,
+        paymentFee: 2.4,
+        paymentSuccessRate: 78,
+        providerShare: 10,
+        promoRate: 12,
+        effectiveTax: 6,
+        cloudCost: 4,
+        withdrawProcessCost: 8,
+        fraudLossRate: 1.2,
+        complianceCost: 6,
+        fixedOpex: 4200000
+      },
+      lean: {
+        marketingBudget: 1200000,
+        cac: 180,
+        organicUplift: 10,
+        activationRate: 42,
+        firstDepositRate: 18,
+        firstDepositAmount: 500,
+        baseMau: 90000,
+        stickiness: 16,
+        lifetimeMonths: 5,
+        payerRate: 2.5,
+        arppu: 520,
+        rechargeFrequency: 2.0,
+        whaleRate: 3.0,
+        whaleArppu: 5500,
+        withdrawRate: 72,
+        subscriptionRate: 0.7,
+        subscriptionPrice: 199,
+        adArpdau: 0.28,
+        b2bRevenue: 200000,
+        paymentFee: 3.2,
+        paymentSuccessRate: 72,
+        providerShare: 15,
+        promoRate: 20,
+        effectiveTax: 10,
+        cloudCost: 6,
+        withdrawProcessCost: 10,
+        fraudLossRate: 1.8,
+        complianceCost: 8,
+        fixedOpex: 2800000
+      },
+      growth: {
+        marketingBudget: 8500000,
+        cac: 95,
+        organicUplift: 32,
+        activationRate: 66,
+        firstDepositRate: 35,
+        firstDepositAmount: 1200,
+        baseMau: 420000,
+        stickiness: 31,
+        lifetimeMonths: 10,
+        payerRate: 6.8,
+        arppu: 1250,
+        rechargeFrequency: 3.5,
+        whaleRate: 7.2,
+        whaleArppu: 12000,
+        withdrawRate: 65,
+        subscriptionRate: 2.4,
+        subscriptionPrice: 299,
+        adArpdau: 0.72,
+        b2bRevenue: 1800000,
+        paymentFee: 2.2,
+        paymentSuccessRate: 82,
+        providerShare: 10,
+        promoRate: 14,
+        effectiveTax: 6,
+        cloudCost: 4,
+        withdrawProcessCost: 7,
+        fraudLossRate: 0.9,
+        complianceCost: 5,
+        fixedOpex: 7300000
+      }
+    };
+
+    const fields = [
+      ["marketingBudget", "currency"],
+      ["cac", "currency"],
+      ["organicUplift", "percent"],
+      ["activationRate", "percent"],
+      ["firstDepositRate", "percent"],
+      ["firstDepositAmount", "currency"],
+      ["baseMau", "number"],
+      ["stickiness", "percent"],
+      ["lifetimeMonths", "months"],
+      ["payerRate", "percent"],
+      ["arppu", "currency"],
+      ["rechargeFrequency", "times"],
+      ["whaleRate", "percent"],
+      ["whaleArppu", "currency"],
+      ["withdrawRate", "percent"],
+      ["subscriptionRate", "percent"],
+      ["subscriptionPrice", "currency"],
+      ["adArpdau", "currency2"],
+      ["b2bRevenue", "currency"],
+      ["paymentFee", "percent"],
+      ["paymentSuccessRate", "percent"],
+      ["providerShare", "percent"],
+      ["promoRate", "percent"],
+      ["effectiveTax", "percent"],
+      ["cloudCost", "currency2"],
+      ["withdrawProcessCost", "currency"],
+      ["fraudLossRate", "percent"],
+      ["complianceCost", "currency"],
+      ["fixedOpex", "currency"]
+    ];
+
+    const elements = {};
+    fields.forEach(([id]) => {
+      elements[id] = document.getElementById(id);
+      elements[id + "Value"] = document.getElementById(id + "Value");
+    });
+
+    const fmtCurrency = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0
+    });
+    const fmtCurrency2 = new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    const fmtNumber = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
+    const fmtDecimal = new Intl.NumberFormat("en-IN", {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1
+    });
+
+    const ids = {
+      netProfit: document.getElementById("netProfit"),
+      grossRevenue: document.getElementById("grossRevenue"),
+      profitMargin: document.getElementById("profitMargin"),
+      revenueMix: document.getElementById("revenueMix"),
+      ltvCac: document.getElementById("ltvCac"),
+      ltvDetail: document.getElementById("ltvDetail"),
+      payback: document.getElementById("payback"),
+      breakEvenCac: document.getElementById("breakEvenCac"),
+      breakdown: document.getElementById("breakdown"),
+      insights: document.getElementById("insights"),
+      profitMetric: document.getElementById("profitMetric"),
+      ltvMetric: document.getElementById("ltvMetric"),
+      statusValue: document.getElementById("statusValue"),
+      statusText: document.getElementById("statusText"),
+      chart: document.getElementById("projectionChart"),
+      copiedText: document.getElementById("copiedText")
+    };
+
+    function valueOf(id) {
+      return Number(elements[id].value);
+    }
+
+    function formatValue(value, type) {
+      if (type === "currency") return fmtCurrency.format(value);
+      if (type === "currency2") return fmtCurrency2.format(value);
+      if (type === "percent") return fmtDecimal.format(value) + "%";
+      if (type === "months") return fmtNumber.format(value) + "个月";
+      if (type === "times") return fmtDecimal.format(value) + "次";
+      return fmtNumber.format(value);
+    }
+
+    function collect() {
+      return fields.reduce((acc, [id]) => {
+        acc[id] = valueOf(id);
+        return acc;
+      }, {});
+    }
+
+    function compute(input) {
+      const paidRegisters = input.marketingBudget / Math.max(input.cac, 1);
+      const totalRegisters = paidRegisters * (1 + input.organicUplift / 100);
+      const activatedUsers = totalRegisters * input.activationRate / 100;
+      const mau = input.baseMau + activatedUsers;
+      const dau = mau * input.stickiness / 100;
+
+      // 首充用户计算
+      const firstDepositUsers = activatedUsers * input.firstDepositRate / 100;
+      const firstDepositRevenue = firstDepositUsers * input.firstDepositAmount;
+
+      // 普通付费用户
+      const regularPayers = mau * input.payerRate / 100;
+      const whalePayers = regularPayers * input.whaleRate / 100;
+      const normalPayers = regularPayers - whalePayers;
+
+      // 订阅用户
+      const subscribers = mau * input.subscriptionRate / 100;
+
+      // 收入计算
+      const iapRevenue = normalPayers * input.arppu + whalePayers * input.whaleArppu;
+      const adRevenue = dau * input.adArpdau * 30;
+      const subscriptionRevenue = subscribers * input.subscriptionPrice;
+      const b2bRevenue = input.b2bRevenue;
+      const grossRevenue = iapRevenue + adRevenue + subscriptionRevenue + b2bRevenue + firstDepositRevenue;
+
+      // 支付成功率影响
+      const actualRevenue = grossRevenue * (input.paymentSuccessRate / 100);
+      const paymentLoss = grossRevenue - actualRevenue;
+
+      // 成本计算
+      const revenueCostRate = (input.paymentFee + input.providerShare + input.promoRate + input.effectiveTax) / 100;
+      const revenueCosts = actualRevenue * revenueCostRate;
+      const cloudCost = mau * input.cloudCost;
+      const complianceCost = totalRegisters * input.complianceCost;
+
+      // 提现处理成本（假设50%用户会提现）
+      const withdrawalCost = (regularPayers * 0.5) * input.withdrawProcessCost;
+
+      // 欺诈损失
+      const fraudLoss = actualRevenue * (input.fraudLossRate / 100);
+
+      const variableCosts = revenueCosts + cloudCost + complianceCost + withdrawalCost + fraudLoss;
+      const totalCosts = variableCosts + input.marketingBudget + input.fixedOpex;
+      const netProfit = actualRevenue - totalCosts;
+      const profitMargin = actualRevenue > 0 ? netProfit / actualRevenue : 0;
+
+      // 提现金额估算
+      const totalDeposit = iapRevenue + firstDepositRevenue;
+      const withdrawAmount = totalDeposit * (input.withdrawRate / 100);
+      const netCashFlow = totalDeposit - withdrawAmount;
+
+      // LTV计算
+      const userRevenue = iapRevenue + adRevenue + subscriptionRevenue;
+      const monthlyArpu = mau > 0 ? userRevenue / mau : 0;
+      const monthlyContribution = Math.max(0, monthlyArpu * (1 - revenueCostRate) - input.cloudCost);
+      const ltv = monthlyContribution * input.lifetimeMonths;
+      const adjustedLtv = ltv * input.activationRate / 100;
+      const ltvCac = input.cac > 0 ? adjustedLtv / input.cac : 0;
+      const paybackMonths = monthlyContribution > 0 ? input.cac / (monthlyContribution * input.activationRate / 100) : Infinity;
+      const breakEvenCac = adjustedLtv;
+
+      return {
+        paidRegisters,
+        totalRegisters,
+        activatedUsers,
+        firstDepositUsers,
+        firstDepositRevenue,
+        mau,
+        dau,
+        regularPayers,
+        whalePayers,
+        normalPayers,
+        subscribers,
+        iapRevenue,
+        adRevenue,
+        subscriptionRevenue,
+        b2bRevenue,
+        grossRevenue,
+        actualRevenue,
+        paymentLoss,
+        paymentSuccessRate: input.paymentSuccessRate,
+        totalDeposit,
+        withdrawAmount,
+        withdrawRate: input.withdrawRate,
+        netCashFlow,
+        revenueCostRate,
+        revenueCosts,
+        cloudCost,
+        complianceCost,
+        withdrawalCost,
+        fraudLoss,
+        variableCosts,
+        totalCosts,
+        netProfit,
+        profitMargin,
+        monthlyArpu,
+        monthlyContribution,
+        ltv,
+        adjustedLtv,
+        ltvCac,
+        paybackMonths,
+        breakEvenCac
+      };
+    }
+
+    function project(input) {
+      const rows = [];
+      const newActivated = (input.marketingBudget / Math.max(input.cac, 1)) * (1 + input.organicUplift / 100) * input.activationRate / 100;
+      const decay = Math.max(0.1, Math.min(0.96, 1 - 1 / Math.max(input.lifetimeMonths, 1.4)));
+      let active = input.baseMau;
+      let cumulative = 0;
+      for (let month = 1; month <= 12; month += 1) {
+        active = active * decay + newActivated;
+        const monthlyInput = { ...input, baseMau: active, complianceCost: input.complianceCost };
+        const result = compute(monthlyInput);
+        cumulative += result.netProfit;
+        rows.push({
+          month,
+          mau: result.mau,
+          revenue: result.actualRevenue,
+          profit: result.netProfit,
+          cumulative
+        });
+      }
+      return rows;
+    }
+
+    function updateRangeFill(range) {
+      const min = Number(range.min);
+      const max = Number(range.max);
+      const value = Number(range.value);
+      const fill = ((value - min) / (max - min)) * 100;
+      range.style.setProperty("--fill", `${fill}%`);
+    }
+
+    function drawChart(rows) {
+      const canvas = ids.chart;
+      const ctx = canvas.getContext("2d");
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.max(640, Math.floor(rect.width * ratio));
+      canvas.height = Math.floor(290 * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+      const w = rect.width;
+      const h = 290;
+      const pad = { top: 22, right: 22, bottom: 36, left: 58 };
+      ctx.clearRect(0, 0, w, h);
+
+      const values = rows.flatMap((r) => [r.revenue, r.profit]);
+      const max = Math.max(...values, 1);
+      const min = Math.min(...values, 0);
+      const span = max - min || 1;
+      const y = (value) => pad.top + (max - value) / span * (h - pad.top - pad.bottom);
+      const zeroY = y(0);
+      const chartW = w - pad.left - pad.right;
+      const barGroup = chartW / rows.length;
+      const barW = Math.max(7, Math.min(24, barGroup * 0.24));
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--hairline-strong");
+      ctx.beginPath();
+      ctx.moveTo(pad.left, zeroY);
+      ctx.lineTo(w - pad.right, zeroY);
+      ctx.stroke();
+
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--muted");
+      ctx.font = "11px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.textAlign = "right";
+      [0, 0.5, 1].forEach((tick) => {
+        const value = min + span * tick;
+        const yy = y(value);
+        ctx.globalAlpha = 0.42;
+        ctx.strokeStyle = getComputedStyle(document.body).getPropertyValue("--hairline");
+        ctx.beginPath();
+        ctx.moveTo(pad.left, yy);
+        ctx.lineTo(w - pad.right, yy);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.fillText(shortMoney(value), pad.left - 8, yy + 4);
+      });
+
+      rows.forEach((row, index) => {
+        const x = pad.left + index * barGroup + barGroup / 2;
+        const revTop = y(row.revenue);
+        const profitTop = y(row.profit);
+        roundRect(ctx, x - barW - 2, revTop, barW, Math.max(2, zeroY - revTop), 5);
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--accent");
+        ctx.fill();
+
+        const profitColor = row.profit >= 0
+          ? getComputedStyle(document.body).getPropertyValue("--accent-2")
+          : getComputedStyle(document.body).getPropertyValue("--danger");
+        const top = row.profit >= 0 ? profitTop : zeroY;
+        const height = Math.max(2, Math.abs(zeroY - profitTop));
+        roundRect(ctx, x + 2, top, barW, height, 5);
+        ctx.fillStyle = profitColor;
+        ctx.fill();
+
+        ctx.fillStyle = getComputedStyle(document.body).getPropertyValue("--muted");
+        ctx.textAlign = "center";
+        ctx.fillText(String(row.month), x, h - 13);
+      });
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      const r = Math.min(radius, Math.abs(width) / 2, Math.abs(height) / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + width, y, x + width, y + height, r);
+      ctx.arcTo(x + width, y + height, x, y + height, r);
+      ctx.arcTo(x, y + height, x, y, r);
+      ctx.arcTo(x, y, x + width, y, r);
+      ctx.closePath();
+    }
+
+    function shortMoney(value) {
+      const abs = Math.abs(value);
+      const sign = value < 0 ? "-" : "";
+      if (abs >= 10000000) return sign + "₹" + fmtDecimal.format(abs / 10000000) + "Cr";
+      if (abs >= 100000) return sign + "₹" + fmtDecimal.format(abs / 100000) + "L";
+      if (abs >= 1000) return sign + "₹" + fmtDecimal.format(abs / 1000) + "K";
+      return sign + fmtCurrency.format(abs);
+    }
+
+    function render() {
+      fields.forEach(([id, type]) => {
+        const input = elements[id];
+        updateRangeFill(input);
+        elements[id + "Value"].textContent = formatValue(Number(input.value), type);
+      });
+
+      const input = collect();
+      const result = compute(input);
+      const rows = project(input);
+
+      ids.netProfit.textContent = shortMoney(result.netProfit);
+      ids.grossRevenue.textContent = shortMoney(result.actualRevenue);
+      ids.profitMargin.textContent = `净利率 ${fmtDecimal.format(result.profitMargin * 100)}%`;
+      ids.revenueMix.textContent = `IAP ${fmtDecimal.format(result.iapRevenue / result.actualRevenue * 100 || 0)}% / 广告 ${fmtDecimal.format(result.adRevenue / result.actualRevenue * 100 || 0)}%`;
+      ids.ltvCac.textContent = fmtDecimal.format(result.ltvCac) + "x";
+      ids.ltvDetail.textContent = `LTV ${fmtCurrency.format(result.adjustedLtv)} / CAC ${fmtCurrency.format(input.cac)}`;
+      ids.payback.textContent = Number.isFinite(result.paybackMonths)
+        ? fmtDecimal.format(result.paybackMonths) + "个月"
+        : "无法回本";
+      ids.breakEvenCac.textContent = `盈亏平衡 CAC ${fmtCurrency.format(result.breakEvenCac)}`;
+
+      // 新增指标
+      document.getElementById("withdrawRateDisplay").textContent = fmtDecimal.format(result.withdrawRate) + "%";
+      document.getElementById("withdrawDetail").textContent = `提现 ${shortMoney(result.withdrawAmount)} / 充值 ${shortMoney(result.totalDeposit)}`;
+
+      document.getElementById("netCashFlow").textContent = shortMoney(result.netCashFlow);
+      document.getElementById("cashflowDetail").textContent = `沉淀 ${fmtDecimal.format((1 - result.withdrawRate/100) * 100)}%`;
+
+      document.getElementById("paymentSuccessDisplay").textContent = fmtDecimal.format(result.paymentSuccessRate) + "%";
+      document.getElementById("paymentLossDisplay").textContent = `损失 ${shortMoney(result.paymentLoss)}`;
+
+      document.getElementById("firstDepositDisplay").textContent = fmtNumber.format(result.firstDepositUsers) + "人";
+      document.getElementById("firstDepositRevenue").textContent = `收入 ${shortMoney(result.firstDepositRevenue)}`;
+
+      ids.profitMetric.classList.toggle("positive", result.netProfit >= 0);
+      ids.profitMetric.classList.toggle("negative", result.netProfit < 0);
+      ids.ltvMetric.classList.toggle("positive", result.ltvCac >= 1.5);
+      ids.ltvMetric.classList.toggle("negative", result.ltvCac < 1);
+
+      // 提现率预警
+      const withdrawMetric = document.getElementById("withdrawMetric");
+      withdrawMetric.classList.toggle("negative", result.withdrawRate > 80);
+      withdrawMetric.classList.toggle("positive", result.withdrawRate >= 60 && result.withdrawRate <= 75);
+
+      // 现金流预警
+      const cashflowMetric = document.getElementById("cashflowMetric");
+      cashflowMetric.classList.toggle("positive", result.netCashFlow > 0);
+      cashflowMetric.classList.toggle("negative", result.netCashFlow < 0);
+
+      // 支付成功率预警
+      const paymentMetric = document.getElementById("paymentMetric");
+      paymentMetric.classList.toggle("negative", result.paymentSuccessRate < 75);
+      paymentMetric.classList.toggle("positive", result.paymentSuccessRate >= 80);
+
+      const status = getStatus(result);
+      ids.statusValue.textContent = status.label;
+      ids.statusValue.className = "status-value " + status.kind;
+      ids.statusText.textContent = status.text;
+
+      renderBreakdown(input, result);
+      renderInsights(input, result, rows);
+      drawChart(rows);
+    }
+
+    function getStatus(result) {
+      if (result.netProfit < 0) {
+        return {
+          label: "亏损",
+          kind: "loss",
+          text: `当前月亏损 ${shortMoney(Math.abs(result.netProfit))}，优先压低 CAC、促销成本或固定运营成本。`
+        };
+      }
+      if (result.ltvCac < 1.5) {
+        return {
+          label: "可盈利但偏薄",
+          kind: "warn",
+          text: `盈利为正，但 LTV/CAC 只有 ${fmtDecimal.format(result.ltvCac)}x，投放放量会比较脆。`
+        };
+      }
+      return {
+        label: "健康盈利",
+        kind: "",
+        text: `LTV/CAC 达到 ${fmtDecimal.format(result.ltvCac)}x，当前参数下可以考虑逐步放量。`
+      };
+    }
+
+    function renderBreakdown(input, result) {
+      const rows = [
+        ["新增注册用户", result.totalRegisters, null, "number"],
+        ["新增活跃用户", result.activatedUsers, null, "number"],
+        ["首充用户", result.firstDepositUsers, result.firstDepositUsers / result.activatedUsers, "number"],
+        ["MAU / DAU", `${fmtNumber.format(result.mau)} / ${fmtNumber.format(result.dau)}`, null, "text"],
+        ["付费用户（普通/大R）", `${fmtNumber.format(result.normalPayers)} / ${fmtNumber.format(result.whalePayers)}`, null, "text"],
+        ["首充收入", result.firstDepositRevenue, result.firstDepositRevenue / result.actualRevenue, "currency"],
+        ["IAP 虚拟商品收入", result.iapRevenue, result.iapRevenue / result.actualRevenue, "currency"],
+        ["订阅收入", result.subscriptionRevenue, result.subscriptionRevenue / result.actualRevenue, "currency"],
+        ["广告收入", result.adRevenue, result.adRevenue / result.actualRevenue, "currency"],
+        ["B2B / 授权收入", result.b2bRevenue, result.b2bRevenue / result.actualRevenue, "currency"],
+        ["总充值额", result.totalDeposit, null, "currency"],
+        ["提现金额", -result.withdrawAmount, -result.withdrawAmount / result.actualRevenue, "currency"],
+        ["净现金流入", result.netCashFlow, null, "currency"],
+        ["支付失败损失", -result.paymentLoss, -result.paymentLoss / result.grossRevenue, "currency"],
+        ["收入相关成本", -result.revenueCosts, -result.revenueCosts / result.actualRevenue, "currency"],
+        ["云与客服", -result.cloudCost, -result.cloudCost / result.actualRevenue, "currency"],
+        ["提现审核成本", -result.withdrawalCost, -result.withdrawalCost / result.actualRevenue, "currency"],
+        ["欺诈损失", -result.fraudLoss, -result.fraudLoss / result.actualRevenue, "currency"],
+        ["获客投放", -input.marketingBudget, -input.marketingBudget / result.actualRevenue, "currency"],
+        ["固定运营", -input.fixedOpex, -input.fixedOpex / result.actualRevenue, "currency"]
+      ];
+
+      ids.breakdown.innerHTML = rows.map(([name, value, share, type]) => {
+        const formatted = type === "number"
+          ? fmtNumber.format(value)
+          : type === "text"
+            ? value
+            : fmtCurrency.format(value);
+        const shareText = share === null || !Number.isFinite(share) ? "-" : fmtDecimal.format(share * 100) + "%";
+        return `<tr><td>${name}</td><td>${formatted}</td><td>${shareText}</td></tr>`;
+      }).join("");
+    }
+
+    function renderInsights(input, result, rows) {
+      const finalCumulative = rows[rows.length - 1].cumulative;
+      const suggestions = [];
+
+      if (result.ltvCac < 1) {
+        suggestions.push(`<strong>LTV/CAC 低于 1。</strong> 每个注册用户的长期贡献覆盖不了获客成本，先把 CAC 拉到 ${fmtCurrency.format(result.breakEvenCac)} 以下，或提升付费率/ARPPU。`);
+      } else if (result.ltvCac < 1.5) {
+        suggestions.push(`<strong>投放效率偏紧。</strong> 建议把放量阈值设在 LTV/CAC 1.5x 以上，避免促销和渠道波动吃掉利润。`);
+      } else {
+        suggestions.push(`<strong>投放效率可接受。</strong> 当前盈亏平衡 CAC 是 ${fmtCurrency.format(result.breakEvenCac)}，比输入 CAC 高 ${fmtDecimal.format((result.breakEvenCac / input.cac - 1) * 100)}%。`);
+      }
+
+      // 提现率预警
+      if (result.withdrawRate > 80) {
+        suggestions.push(`<strong>⚠️ 提现率过高 ${fmtDecimal.format(result.withdrawRate)}%。</strong> 玩家赢太多，检查游戏 RTP 设置或 House Edge 是否过低。健康值应在 60-75%。`);
+      } else if (result.withdrawRate < 50) {
+        suggestions.push(`<strong>⚠️ 提现率过低 ${fmtDecimal.format(result.withdrawRate)}%。</strong> 可能提现门槛太高或用户流失太快，影响口碑和留存。`);
+      } else {
+        suggestions.push(`<strong>提现率健康 ${fmtDecimal.format(result.withdrawRate)}%。</strong> 平台留存了 ${fmtDecimal.format(100 - result.withdrawRate)}% 的充值作为利润，属于可持续范围。`);
+      }
+
+      // 支付成功率预警
+      if (result.paymentSuccessRate < 75) {
+        suggestions.push(`<strong>⚠️ 支付成功率仅 ${fmtDecimal.format(result.paymentSuccessRate)}%。</strong> 每月损失潜在收入 ${shortMoney(result.paymentLoss)}，建议接入多支付网关并自动切换。`);
+      } else if (result.paymentSuccessRate >= 80) {
+        suggestions.push(`<strong>支付成功率良好 ${fmtDecimal.format(result.paymentSuccessRate)}%。</strong> 继续保持多通道策略，失败自动切换备用网关。`);
+      }
+
+      // 首充转化
+      const firstDepositConv = (result.firstDepositUsers / result.activatedUsers) * 100;
+      if (firstDepositConv < 20) {
+        suggestions.push(`<strong>首充转化率偏低 ${fmtDecimal.format(firstDepositConv)}%。</strong> 优化新手引导、降低首充门槛至₹100，或增加首充奖励吸引力。`);
+      } else if (firstDepositConv >= 30) {
+        suggestions.push(`<strong>首充转化优秀 ${fmtDecimal.format(firstDepositConv)}%。</strong> 说明产品吸引力强，可以适当提高首充门槛或降低奖励比例以提升利润率。`);
+      }
+
+      // 大R用户分析
+      const whaleRevenue = result.whalePayers * input.whaleArppu;
+      const whaleContribution = whaleRevenue / result.iapRevenue * 100;
+      if (whaleContribution > 60) {
+        suggestions.push(`<strong>大R用户贡献 ${fmtDecimal.format(whaleContribution)}%。</strong> 收入高度依赖少数高价值用户，需要建立VIP体系和专属客服防止流失。`);
+      } else if (whaleContribution < 30) {
+        suggestions.push(`<strong>收入分布较均衡。</strong> 大R贡献 ${fmtDecimal.format(whaleContribution)}%，可通过VIP特权和高额充值奖励吸引更多高价值用户。`);
+      }
+
+      if (input.promoRate + input.effectiveTax + input.providerShare > 42) {
+        suggestions.push(`<strong>收入被成本吃掉较多。</strong> 供应商、促销和税费合计 ${fmtDecimal.format(input.providerShare + input.promoRate + input.effectiveTax)}%，需要控制活动赠送和供应商分成。`);
+      } else {
+        suggestions.push(`<strong>收入成本结构尚可。</strong> 继续用小额金币包、订阅和广告混合变现，降低对单一付费项的依赖。`);
+      }
+
+      // 现金流健康度
+      if (result.netCashFlow > 0) {
+        suggestions.push(`<strong>现金流为正 ${shortMoney(result.netCashFlow)}。</strong> 扣除提现后仍有净流入，可支持扩大获客投放。`);
+      } else {
+        suggestions.push(`<strong>⚠️ 现金流为负 ${shortMoney(result.netCashFlow)}。</strong> 提现超过充值，需要准备流动性储备或降低提现率。`);
+      }
+
+      if (finalCumulative < 0) {
+        suggestions.push(`<strong>12 个月累计仍亏损。</strong> 当前累计结果为 ${shortMoney(finalCumulative)}，适合先做小规模验证。`);
+      } else {
+        suggestions.push(`<strong>12 个月累计为正。</strong> 当前累计利润约 ${shortMoney(finalCumulative)}，可以拿它作为融资或预算申请的基准情景。`);
+      }
+
+      ids.insights.innerHTML = suggestions.map((text) => `<div class="insight">${text}</div>`).join("");
+    }
+
+    function setPreset(name) {
+      const preset = presets[name];
+      Object.entries(preset).forEach(([id, value]) => {
+        elements[id].value = value;
+      });
+      document.querySelectorAll("[data-preset]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.preset === name);
+      });
+      render();
+    }
+
+    function summaryText() {
+      const input = collect();
+      const result = compute(input);
+      return [
+        "India ProfitLab 测算摘要",
+        `月收入: ${fmtCurrency.format(result.grossRevenue)}`,
+        `月净利润: ${fmtCurrency.format(result.netProfit)}`,
+        `净利率: ${fmtDecimal.format(result.profitMargin * 100)}%`,
+        `MAU/DAU: ${fmtNumber.format(result.mau)} / ${fmtNumber.format(result.dau)}`,
+        `LTV/CAC: ${fmtDecimal.format(result.ltvCac)}x`,
+        `回本周期: ${Number.isFinite(result.paybackMonths) ? fmtDecimal.format(result.paybackMonths) + "个月" : "无法回本"}`,
+        `盈亏平衡 CAC: ${fmtCurrency.format(result.breakEvenCac)}`
+      ].join("\n");
+    }
+
+    fields.forEach(([id]) => {
+      elements[id].addEventListener("input", () => {
+        document.querySelectorAll("[data-preset]").forEach((button) => button.classList.remove("active"));
+        render();
+      });
+    });
+
+    document.querySelectorAll("[data-preset]").forEach((button) => {
+      button.addEventListener("click", () => setPreset(button.dataset.preset));
+    });
+
+    document.getElementById("resetBase").addEventListener("click", () => setPreset("base"));
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const isDark = document.body.dataset.theme === "dark";
+      document.body.dataset.theme = isDark ? "" : "dark";
+      document.getElementById("themeToggle").textContent = isDark ? "深色" : "浅色";
+      render();
+    });
+
+    document.getElementById("copySummary").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(summaryText());
+        ids.copiedText.classList.add("show");
+        setTimeout(() => ids.copiedText.classList.remove("show"), 1300);
+      } catch (error) {
+        ids.copiedText.textContent = "复制受限";
+        ids.copiedText.classList.add("show");
+        setTimeout(() => {
+          ids.copiedText.classList.remove("show");
+          ids.copiedText.textContent = "已复制";
+        }, 1500);
+      }
+    });
+
+    window.addEventListener("resize", render);
+    setPreset("base");
+  </script>
+</body>
+</html>
